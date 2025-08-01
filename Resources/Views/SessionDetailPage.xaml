@@ -1,0 +1,19 @@
+<ContentPage
+   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+
+    x:Class="ProVoiceLedger.Views.SessionDetailPage"
+    Title="Session Details"
+    BackgroundColor="#FAFAFA">
+
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <Label Text="Session Title" FontSize="20" FontAttributes="Bold" />
+        <Label x:Name="SessionDateLabel" Text="Recorded on..." FontSize="16" TextColor="Gray" />
+
+        <Button Text="Play Recording" WidthRequest="200" Clicked="OnPlayClicked" />
+
+        <Button Text="Rename Session" WidthRequest="200" Clicked="OnRenameClicked" />
+
+        <Button Text="Send / Export" WidthRequest="200" Clicked="OnSendClicked" />
+    </VerticalStackLayout>
+</ContentPage>

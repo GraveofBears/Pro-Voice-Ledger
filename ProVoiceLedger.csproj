@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 🔧 Project Setup -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-windows;net8.0-android</TargetFrameworks>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>ProVoiceLedger</RootNamespace>
+
+    <!-- 🪪 App Identity -->
+    <ApplicationTitle>ProVoiceLedger</ApplicationTitle>
+    <ApplicationId>com.companyname.provoiceledger</ApplicationId>
+    <ApplicationIdGuid>0bef1ded-7839-43c0-8396-7773082f3dca</ApplicationIdGuid>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+  </PropertyGroup>
+
+  <!-- 🪟 Windows Platform Setup -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-windows'">
+    <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
+	<WindowsPackageType>None</WindowsPackageType>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <!-- 📱 Android Platform Setup -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-android'">
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <AndroidSdkDirectory>C:\Users\GraveBear\AppData\Local\Android\Sdk</AndroidSdkDirectory>
+  </PropertyGroup>
+
+  <!-- 📦 Dependencies -->
+  <ItemGroup>
+    <!-- MAUI Core -->
+    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
+    <PackageReference Include="Microsoft.Maui.Core" Version="8.0.100" />
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.100" />
+
+    <!-- .NET Extensions -->
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+
+    <!-- SQLite -->
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+  </ItemGroup>
+
+  <!-- 🎨 UI Assets -->
+  <ItemGroup>
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+    <MauiImage Include="Resources\Images\*" />
+    <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+    <MauiFont Include="Resources\Fonts\*" />
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- 📜 XAML Views -->
+  <ItemGroup>
+    <MauiXaml Update="Pages\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Resources\Views\HistoryPage.xaml" Generator="MSBuild:Compile" />
+    <MauiXaml Update="Resources\Views\RecordingPage.xaml" Generator="MSBuild:Compile" />
+    <MauiXaml Update="Resources\Views\SessionDetailPage.xaml" Generator="MSBuild:Compile" />
+  </ItemGroup>
+
+</Project>

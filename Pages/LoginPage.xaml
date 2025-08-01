@@ -1,0 +1,19 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="YourApp.Pages.LoginPage"
+             Title="Secure Login"
+             BackgroundColor="#f4f4f4">
+
+	<VerticalStackLayout Padding="30" Spacing="20">
+		<Label Text="Welcome back" FontSize="24" TextColor="#333" />
+
+		<Entry x:Name="UsernameEntry" Placeholder="Username" TextColor="#000" />
+		<Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" TextColor="#000" />
+
+		<ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" Color="#555" />
+
+		<Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" FontSize="12" />
+
+		<Button x:Name="LoginButton" Text="Login" Clicked="OnLoginClicked" BackgroundColor="#007AFF" TextColor="White" CornerRadius="10" />
+	</VerticalStackLayout>
+</ContentPage>

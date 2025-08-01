@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ProVoiceLedger.MainPage"
+    Title="ProVoice Ledger"
+    BackgroundColor="#FAFAFA">
+
+    <Grid Padding="36"
+          VerticalOptions="Center"
+          HorizontalOptions="Center">
+
+        <!-- Base Layout Stack -->
+        <VerticalStackLayout
+            x:Name="MainLayout"
+            Spacing="24"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+
+            <!-- 🪶 Header -->
+            <Label
+                Text="ProVoice Ledger"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="#2C3E50"
+                HorizontalOptions="Center" />
+
+            <!-- 🖊️ Optional Session Name -->
+            <Entry
+                x:Name="SessionNameEntry"
+                Placeholder="Session name (optional)"
+                FontSize="16"
+                BackgroundColor="#FFFFFF"
+                TextColor="#333333"
+                WidthRequest="280"
+                Margin="0,12" />
+
+            <!-- 🎙️ Start Recording -->
+            <Button
+                x:Name="RecordButton"
+                Text="Start Recording"
+                FontSize="18"
+                BackgroundColor="#2C3E50"
+                TextColor="White"
+                CornerRadius="12"
+                WidthRequest="220"
+                Clicked="OnStartRecordingClicked" />
+
+            <!-- 🖱️ Counter Button (with overlay effect in code-behind) -->
+            <Button
+                x:Name="CounterBtn"
+                Text="Click Me"
+                FontSize="18"
+                BackgroundColor="#34495E"
+                TextColor="White"
+                CornerRadius="12"
+                WidthRequest="220"
+                Clicked="OnCounterClicked" />
+
+            <!-- 🗂️ History Access -->
+            <Button
+                x:Name="HistoryButton"
+                Text="View Past Sessions"
+                FontSize="16"
+                BackgroundColor="#EAEAEA"
+                TextColor="#2C3E50"
+                CornerRadius="12"
+                WidthRequest="220"
+                Clicked="OnViewHistoryClicked"
+                Margin="0,8" />
+
+            <!-- 🕯️ Gentle Guidance -->
+            <Label
+                Text="Sessions will auto-name using date/time unless specified."
+                FontSize="12"
+                TextColor="Gray"
+                HorizontalOptions="Center"
+                Margin="0,20,0,0" />
+        </VerticalStackLayout>
+
+        <!-- ✨ Recording Shimmer Overlay -->
+        <BoxView
+            x:Name="ShimmerOverlay"
+            BackgroundColor="#40FFFFFF"
+            IsVisible="False"
+            InputTransparent="True"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill" />
+
+        <!-- ✔️ Session Save Confirmation (wrapped for CornerRadius support) -->
+        <Frame
+            x:Name="ConfirmSaveOverlay"
+            BackgroundColor="#E0FFE0"
+            BorderColor="Green"
+            CornerRadius="8"
+            Padding="12"
+            IsVisible="False"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            HasShadow="True"
+            ZIndex="10">
+            <Label
+                Text="✔ Session Saved"
+                FontSize="20"
+                FontAttributes="Bold"
+                TextColor="Green"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Frame>
+    </Grid>
+</ContentPage>

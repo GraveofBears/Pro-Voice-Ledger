@@ -1,0 +1,50 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ProVoiceLedger.Views.RecordingPage"
+    Title="Record Session"
+    BackgroundColor="#F0F0F0">
+
+	<VerticalStackLayout Padding="36" Spacing="24" VerticalOptions="Center" HorizontalOptions="Center">
+
+		<Label
+            Text="🗂️ Start a New Recording"
+            FontSize="26"
+            FontFamily="Georgia"
+            FontAttributes="Bold"
+            TextColor="#2C3E50"
+            HorizontalTextAlignment="Center" />
+
+		<Entry
+            x:Name="SessionNameEntry"
+            Placeholder="Session name (optional)"
+            WidthRequest="280"
+            BackgroundColor="#FFFFFF"
+            TextColor="#34495E"
+            Margin="0,8"
+            HeightRequest="44"
+            PlaceholderColor="#BDC3C7"
+            FontSize="16"
+            FontFamily="Courier New" />
+
+		<Button
+            x:Name="RecordButton"
+            Text="🎙️ Begin Recording"
+            WidthRequest="220"
+            HeightRequest="50"
+            Clicked="OnRecordClicked"
+            BackgroundColor="#34495E"
+            TextColor="White"
+            FontAttributes="Bold"
+            CornerRadius="18"
+            FontSize="18"
+            SemanticProperties.Hint="Starts a voice session recording"
+            />
+
+		<!-- 🌀 Future visual: waveform or timer -->
+		<Border BackgroundColor="#EAEAEA" WidthRequest="280" HeightRequest="80" Stroke="#CCCCCC" StrokeThickness="1" Margin="0,24">
+			<Label Text="[Waveform placeholder]" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#7F8C8D"/>
+		</Border>
+
+	</VerticalStackLayout>
+</ContentPage>

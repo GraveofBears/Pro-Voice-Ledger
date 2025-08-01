@@ -1,0 +1,57 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProVoiceLedger.Pages.RecordingPage"
+             Title="Voice Session Recorder"
+             BackgroundColor="Black"
+             Padding="20">
+
+    <VerticalStackLayout Spacing="15">
+        <Entry x:Name="SessionNameEntry"
+               Placeholder="Enter session name"
+               FontSize="16"
+               TextColor="White"
+               PlaceholderColor="#CCCCCC" />
+
+        <!-- 🎬 Action Buttons -->
+        <Button Text="Start Recording"
+                Clicked="OnStartRecordingClicked"
+                IsEnabled="{Binding IsNotRecording}"
+                AutomationProperties.Name="Start Recording Button" />
+
+        <Button Text="Stop Recording"
+                Clicked="OnStopRecordingClicked"
+                IsEnabled="{Binding IsRecording}"
+                AutomationProperties.Name="Stop Recording Button" />
+
+        <!-- 🔴 Visual Recording Indicator -->
+        <Grid HorizontalOptions="Center" VerticalOptions="Center" Padding="10">
+            <Ellipse x:Name="RecordingIndicator"
+                     WidthRequest="60"
+                     HeightRequest="60"
+                     Fill="Red"
+                     IsVisible="{Binding IsRecording}" />
+
+            <BoxView WidthRequest="100"
+                     HeightRequest="100"
+                     Color="Red"
+                     Opacity="0.3"
+                     CornerRadius="50"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center"
+                     IsVisible="{Binding IsRecording}" />
+        </Grid>
+
+        <!-- 📋 Session Info -->
+        <Label FontSize="14"
+               LineBreakMode="WordWrap"
+               TextColor="#BBBBBB"
+               Margin="0,10,0,0">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="Last session: " />
+                    <Span Text="{Binding LastSessionInfo}" />
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+    </VerticalStackLayout>
+</ContentPage>
