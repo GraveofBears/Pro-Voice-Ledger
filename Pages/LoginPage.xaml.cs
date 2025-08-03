@@ -37,7 +37,7 @@ public partial class LoginPage : ContentPage
 
         try
         {
-            string loginUrl = "https://localhost:7071/api/auth/login";
+            string loginUrl = "https://localhost:7290/api/auth/login";
 
             // 📡 Send login request to server
             HttpResponseMessage response = await _httpClient.PostAsJsonAsync(loginUrl, loginRequest);

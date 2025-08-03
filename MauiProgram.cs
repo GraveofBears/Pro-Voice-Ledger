@@ -60,8 +60,8 @@ public static class MauiProgram
                     Source = "logo.png", // Make sure logo.png is in Resources/Images and marked as MauiImage
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    WidthRequest = 200,
-                    HeightRequest = 200
+                    WidthRequest = 300,
+                    HeightRequest = 300
                 },
                 BackgroundColor = Colors.White
             };

@@ -36,7 +36,7 @@ public partial class MainPage : ContentPage
         string username = UsernameEntry?.Text ?? string.Empty;
         string password = PasswordEntry?.Text ?? string.Empty;
 
-        var loginUrl = "https://localhost:7071/api/auth/login";
+        var loginUrl = "https://localhost:7290/api/auth/login";
         var request = new LoginRequest
         {
             Username = username,
