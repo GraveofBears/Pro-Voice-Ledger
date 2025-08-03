@@ -1,5 +1,7 @@
 ﻿using SQLite;
 using System;
+using ProVoiceLedger.Core.Models;
+using ProVoiceLedger.Core.Services;
 
 namespace ProVoiceLedger.Core.Models
 {

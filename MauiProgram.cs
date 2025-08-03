@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
-using ProVoiceLedger.Core;
+using ProVoiceLedger.AudioBackup;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
-using ProVoiceLedger.AudioBackup;
+using ProVoiceLedger.Pages;
 
 namespace ProVoiceLedger;
 
@@ -24,22 +24,31 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // 🔧 Register core services
+        builder.Services.AddSingleton<UserRepository>(); // Required by AuthService
+        builder.Services.AddSingleton<AuthService>();
+        builder.Services.AddSingleton<FileStorageService>();
+        builder.Services.AddSingleton<CommunicationService>();
+        builder.Services.AddSingleton<PipeServerService>();
 
-        // 🧪 Register development/testing audio services
+        // 🎙️ Audio and Recording
         builder.Services.AddSingleton<IAudioCaptureService, MockAudioCaptureService>();
         builder.Services.AddSingleton<IRecordingService, RecordingService>();
+        builder.Services.AddSingleton<RecordingUploadService>();
 
-        // 📁 Register SQLite session database
+        // 🗂️ SQLite-backed session database
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "sessions.db");
-        builder.Services.AddSingleton<SessionDatabase>(provider => new SessionDatabase(dbPath));
+        builder.Services.AddSingleton(provider => new SessionDatabase(dbPath));
 
-        // 🌱 Inject App with a runtime test page to isolate shell issues
+        // 📄 Register pages
+        builder.Services.AddTransient<RecordingPage>();
+
+        // 🌿 Root app setup
         builder.Services.AddSingleton<App>(provider =>
         {
             var db = provider.GetRequiredService<SessionDatabase>();
-
-            // ✅ Replace AppShell with minimal content
             var app = new App(db);
+
             app.MainPage = new ContentPage
             {
                 Content = new Label
@@ -49,9 +58,16 @@ public static class MauiProgram
                     VerticalOptions = LayoutOptions.Center
                 }
             };
+
             return app;
         });
 
-        return builder.Build();
+        var app = builder.Build();
+
+        // 🚀 Launch background listener
+        var pipeServer = app.Services.GetRequiredService<PipeServerService>();
+        Task.Run(() => pipeServer.StartListenerAsync());
+
+        return app;
     }
 }

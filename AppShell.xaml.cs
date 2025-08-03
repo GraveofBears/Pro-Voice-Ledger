@@ -17,7 +17,11 @@ public partial class AppShell : Shell
             File.AppendAllText(logPath, $"{timestamp} - 🚪 Entered AppShell constructor\n");
             Debug.WriteLine($"{timestamp}: 🚪 Entered AppShell constructor");
 
-            InitializeComponent(); // Minimal shell — should be safe
+            InitializeComponent();
+
+            Routing.RegisterRoute("login", typeof(Pages.LoginPage));
+            Routing.RegisterRoute("main", typeof(Pages.RecordingPage));
+            Routing.RegisterRoute("history", typeof(Pages.SessionHistoryPage));
 
             File.AppendAllText(logPath, $"{timestamp} - ✅ AppShell InitializeComponent succeeded\n");
             Debug.WriteLine($"{timestamp}: ✅ AppShell InitializeComponent succeeded");

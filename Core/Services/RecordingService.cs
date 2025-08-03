@@ -10,7 +10,7 @@ namespace ProVoiceLedger.Core.Services
     public interface IRecordingService
     {
         void StartRecording();
-        void StopRecording();
+        byte[] StopRecording();
         bool IsRecording { get; }
     }
 
@@ -29,15 +29,17 @@ namespace ProVoiceLedger.Core.Services
             Console.WriteLine("🎤 Recording started");
         }
 
-        public void StopRecording()
+        public byte[] StopRecording()
         {
             if (!IsRecording)
-                return;
+                return null;
 
             IsRecording = false;
 
             // TODO: Stop stream, finalize file, tag timestamp
             Console.WriteLine("🛑 Recording stopped");
+
+            return null;
         }
     }
 }

@@ -1,18 +1,20 @@
 ﻿using Microsoft.Maui.Controls;
-using ProVoiceLedger.Core.Services;
 using ProVoiceLedger.Core.Models;
+using ProVoiceLedger.Core.Services;
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace ProVoiceLedger.Pages
 {
     public partial class RecordingPage : ContentPage, INotifyPropertyChanged
     {
-        private readonly IRecordingService _recordingService;
+        private readonly IAudioCaptureService _audioCaptureService;
         private readonly SessionDatabase _sessionDb;
+        private readonly RecordingUploadService _uploadService;
+        private readonly User _currentUser;
 
         private bool _isRecording;
         public bool IsRecording
@@ -45,73 +47,104 @@ namespace ProVoiceLedger.Pages
             }
         }
 
-        public RecordingPage(IRecordingService recordingService, SessionDatabase sessionDb)
+        public RecordingPage(IAudioCaptureService audioCaptureService, SessionDatabase sessionDb, User loggedInUser)
         {
             InitializeComponent();
-            _recordingService = recordingService;
+            _audioCaptureService = audioCaptureService;
             _sessionDb = sessionDb;
+            _uploadService = new RecordingUploadService();
+            _currentUser = loggedInUser;
             BindingContext = this;
         }
 
-        private void OnStartRecordingClicked(object sender, EventArgs e)
+        private async void OnStartRecordingClicked(object sender, EventArgs e)
         {
-            var sessionName = SessionNameEntry?.Text?.Trim();
-            if (string.IsNullOrEmpty(sessionName))
+            if (_currentUser.IsSuspended)
             {
-                DisplayAlert("Missing Name", "Please enter a session name.", "OK");
+#pragma warning disable CA1416
+                await DisplayAlert("Access Denied", "Your account is suspended. You cannot record sessions.", "OK");
+#pragma warning restore CA1416
                 return;
             }
 
-            _recordingService.StartRecording();
-            IsRecording = true;
+#pragma warning disable CA1416
+            var sessionName = SessionNameEntry?.Text?.Trim();
+#pragma warning restore CA1416
+            if (string.IsNullOrEmpty(sessionName))
+            {
+#pragma warning disable CA1416
+                await DisplayAlert("Missing Name", "Please enter a session name.", "OK");
+#pragma warning restore CA1416
+                return;
+            }
 
+            await _audioCaptureService.StartRecordingAsync(sessionName);
+            IsRecording = true;
             AnimateRecordingIndicator();
         }
 
         private async void OnStopRecordingClicked(object sender, EventArgs e)
         {
-            _recordingService.StopRecording();
+            var recordedClip = await _audioCaptureService.StopRecordingAsync();
             IsRecording = false;
 
-            var timestamp = DateTime.Now;
-            var clipPath = "MockPath/AudioClip.wav"; // Replace with actual output path
-            var clipDuration = GetMockDuration();    // Replace with real method
+            var timestamp = DateTime.UtcNow;
+#pragma warning disable CA1416
+            var sessionName = SessionNameEntry?.Text?.Trim() ?? "Untitled";
+#pragma warning restore CA1416
+            var clipDuration = recordedClip?.Duration ?? GetMockDuration();
 
-            LastSessionInfo = $"📁 {clipPath}\n" +
-                              $"🕒 Duration: {clipDuration.TotalSeconds:n1}s\n" +
-                              $"🗓️ Timestamp: {timestamp:g}";
-
-            var sessionName = SessionNameEntry?.Text?.Trim() ?? "Untitled Session";
-
-            var session = new Session
+            bool saved = false;
+            if (recordedClip != null)
             {
-                Title = sessionName,
-                StartTime = timestamp,
-                FilePath = clipPath,
-                DurationSeconds = clipDuration.TotalSeconds
-            };
+                // If you want to upload the actual audio, load the file as bytes here
+                byte[] audioBuffer = Array.Empty<byte>();
+                if (!string.IsNullOrEmpty(recordedClip.FilePath) && File.Exists(recordedClip.FilePath))
+                {
+                    audioBuffer = await File.ReadAllBytesAsync(recordedClip.FilePath);
+                }
+                saved = _uploadService.SaveRecording(_currentUser, audioBuffer, sessionName);
+            }
 
-            await _sessionDb.SaveSessionAsync(session);
+            LastSessionInfo = saved
+                ? $"✅ Saved to: /Recordings/{_currentUser.Username}/\n🕒 {clipDuration.TotalSeconds:n1}s — {timestamp:g}"
+                : $"❌ Upload failed. Check folder or access rights.";
+
+            if (saved && recordedClip != null)
+            {
+                var session = new Session
+                {
+                    Title = sessionName,
+                    StartTime = timestamp,
+                    FilePath = recordedClip.FilePath ?? $"Recordings/{_currentUser.Username}/{sessionName}_{timestamp:yyyyMMdd_HHmmss}.wav",
+                    DurationSeconds = clipDuration.TotalSeconds,
+                    DeviceUsed = recordedClip.DeviceUsed
+                };
+
+                await _sessionDb.SaveSessionAsync(session);
+            }
         }
 
-        // Stub method – replace with real .wav duration logic
         private TimeSpan GetMockDuration()
         {
-            return TimeSpan.FromSeconds(10.3);
+            return TimeSpan.FromSeconds(10.3); // Replace with actual duration logic
         }
 
         private async void AnimateRecordingIndicator()
         {
             while (IsRecording)
             {
+#pragma warning disable CA1416
                 await RecordingIndicator.ScaleTo(1.2, 400, Easing.CubicInOut);
                 await RecordingIndicator.ScaleTo(1.0, 400, Easing.CubicInOut);
+#pragma warning restore CA1416
             }
+#pragma warning disable CA1416
             await RecordingIndicator.ScaleTo(1.0, 200);
+#pragma warning restore CA1416
         }
 
         public new event PropertyChangedEventHandler? PropertyChanged;
-
         protected virtual void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

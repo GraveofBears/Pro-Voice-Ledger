@@ -1,57 +1,47 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ProVoiceLedger.Pages.RecordingPage"
-             Title="Voice Session Recorder"
-             BackgroundColor="Black"
-             Padding="20">
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ProVoiceLedger.Pages.RecordingPage"
+    Title="Record Session"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <VerticalStackLayout Spacing="15">
+    <VerticalStackLayout Padding="24" Spacing="20">
+
+        <Label Text="Session Name"
+               FontSize="Medium"
+               HorizontalOptions="Center" />
+
         <Entry x:Name="SessionNameEntry"
                Placeholder="Enter session name"
-               FontSize="16"
-               TextColor="White"
-               PlaceholderColor="#CCCCCC" />
+               HorizontalOptions="FillAndExpand" />
 
-        <!-- 🎬 Action Buttons -->
-        <Button Text="Start Recording"
-                Clicked="OnStartRecordingClicked"
-                IsEnabled="{Binding IsNotRecording}"
-                AutomationProperties.Name="Start Recording Button" />
+        <Image x:Name="RecordingIndicator"
+               Source="mic_icon.png"
+               WidthRequest="64"
+               HeightRequest="64"
+               HorizontalOptions="Center" />
 
-        <Button Text="Stop Recording"
-                Clicked="OnStopRecordingClicked"
-                IsEnabled="{Binding IsRecording}"
-                AutomationProperties.Name="Stop Recording Button" />
+        <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
+            <Button Text="Start"
+                    IsEnabled="{Binding IsNotRecording}"
+                    Clicked="OnStartRecordingClicked"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White" />
 
-        <!-- 🔴 Visual Recording Indicator -->
-        <Grid HorizontalOptions="Center" VerticalOptions="Center" Padding="10">
-            <Ellipse x:Name="RecordingIndicator"
-                     WidthRequest="60"
-                     HeightRequest="60"
-                     Fill="Red"
-                     IsVisible="{Binding IsRecording}" />
+            <Button Text="Stop"
+                    IsEnabled="{Binding IsRecording}"
+                    Clicked="OnStopRecordingClicked"
+                    BackgroundColor="#F44336"
+                    TextColor="White" />
+        </HorizontalStackLayout>
 
-            <BoxView WidthRequest="100"
-                     HeightRequest="100"
-                     Color="Red"
-                     Opacity="0.3"
-                     CornerRadius="50"
-                     HorizontalOptions="Center"
-                     VerticalOptions="Center"
-                     IsVisible="{Binding IsRecording}" />
-        </Grid>
+        <Label Text="{Binding LastSessionInfo}"
+               FontSize="Small"
+               TextColor="#666"
+               HorizontalOptions="Center"
+               Margin="10"/>
 
-        <!-- 📋 Session Info -->
-        <Label FontSize="14"
-               LineBreakMode="WordWrap"
-               TextColor="#BBBBBB"
-               Margin="0,10,0,0">
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="Last session: " />
-                    <Span Text="{Binding LastSessionInfo}" />
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
     </VerticalStackLayout>
+
 </ContentPage>

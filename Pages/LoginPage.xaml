@@ -1,19 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="YourApp.Pages.LoginPage"
-             Title="Secure Login"
-             BackgroundColor="#f4f4f4">
+             x:Class="ProVoiceLedger.Pages.LoginPage"
+             BackgroundColor="White">
 
-	<VerticalStackLayout Padding="30" Spacing="20">
-		<Label Text="Welcome back" FontSize="24" TextColor="#333" />
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <Label Text="Sign In" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
 
-		<Entry x:Name="UsernameEntry" Placeholder="Username" TextColor="#000" />
-		<Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" TextColor="#000" />
+        <Entry x:Name="UsernameEntry" Placeholder="Username" />
+        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
 
-		<ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" Color="#555" />
+        <Button Text="Login" Clicked="OnLoginClicked" BackgroundColor="#3498db" TextColor="White" />
+    </VerticalStackLayout>
 
-		<Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" FontSize="12" />
-
-		<Button x:Name="LoginButton" Text="Login" Clicked="OnLoginClicked" BackgroundColor="#007AFF" TextColor="White" CornerRadius="10" />
-	</VerticalStackLayout>
 </ContentPage>

@@ -1,83 +1,60 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using System.Text;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using Microsoft.Maui.Controls;
+using ProVoiceLedger.Core.Models;
 
-namespace YourApp.Pages
+namespace ProVoiceLedger.Pages;
+
+public partial class LoginPage : ContentPage
 {
-    public partial class LoginPage : ContentPage
+    private readonly HttpClient _httpClient;
+
+    public LoginPage()
     {
-        public LoginPage()
+        InitializeComponent();
+        _httpClient = new HttpClient(); // Consider DI later if needed
+    }
+
+    private async void OnLoginClicked(object sender, EventArgs e)
+    {
+        string username = UsernameEntry?.Text ?? string.Empty;
+        string password = PasswordEntry?.Text ?? string.Empty;
+
+        var request = new LoginRequest
         {
-            InitializeComponent(); // 🔥 This activates the visual tree from XAML
-        }
+            Username = username,
+            Password = password
+        };
 
-        private async void OnLoginClicked(object sender, EventArgs e)
+        try
         {
-            ErrorLabel.IsVisible = false;
-            LoadingIndicator.IsVisible = true;
-            LoadingIndicator.IsRunning = true;
-            LoginButton.IsEnabled = false;
+            string loginUrl = "https://localhost:7071/api/auth/login";
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync(loginUrl, request);
 
-            var username = UsernameEntry.Text?.Trim();
-            var password = PasswordEntry.Text?.Trim();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (response.IsSuccessStatusCode)
             {
-                ErrorLabel.Text = "Username and password are required.";
-                ErrorLabel.IsVisible = true;
-                ResetUI();
-                return;
-            }
-
-            try
-            {
-                var response = await VerifyLoginAsync(username, password);
-
-                if (response.status == "success")
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                if (result != null && result.Success)
                 {
-                    await DisplayAlert("Login Success", $"Welcome {response.displayName}!", "Continue");
-                    // await Navigation.PushAsync(new HomePage());
+                    await DisplayAlert("Welcome", $"Role: {result.Role}", "OK");
+
+                    // TODO: Store token, navigate to main page, or personalize experience
+                    await Shell.Current.GoToAsync("main");
                 }
                 else
                 {
-                    ErrorLabel.Text = response.message ?? "Invalid login.";
-                    ErrorLabel.IsVisible = true;
+                    await DisplayAlert("Login Failed", result?.Message ?? "Invalid credentials", "Retry");
                 }
             }
-            catch (Exception)
+            else
             {
-                ErrorLabel.Text = "Server error. Try again later.";
-                ErrorLabel.IsVisible = true;
+                await DisplayAlert("Server Error", $"Status code: {response.StatusCode}", "Close");
             }
-
-            ResetUI();
         }
-
-        private void ResetUI()
+        catch (Exception ex)
         {
-            LoadingIndicator.IsVisible = false;
-            LoadingIndicator.IsRunning = false;
-            LoginButton.IsEnabled = true;
-        }
-
-        private async Task<LoginResponse> VerifyLoginAsync(string username, string password)
-        {
-            var payload = new { username, password };
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            using var client = new HttpClient();
-            var response = await client.PostAsync("https://yourdomain.com/api/login", content);
-            var resultJson = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<LoginResponse>(resultJson);
-        }
-
-        public class LoginResponse
-        {
-            public string status { get; set; }
-            public string displayName { get; set; }
-            public int userId { get; set; }
-            public string message { get; set; }
+            await DisplayAlert("Network Error", ex.Message, "Close");
         }
     }
 }

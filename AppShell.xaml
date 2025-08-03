@@ -2,11 +2,12 @@
 <Shell
     x:Class="ProVoiceLedger.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:ProVoiceLedger.Pages">
 
-    <!-- 🔹 Basic navigation shell with two pages (no icons, no templates) -->
-    <TabBar>
-        <ShellContent Title="Record" ContentTemplate="{DataTemplate ContentPage}" />
-        <ShellContent Title="History" ContentTemplate="{DataTemplate ContentPage}" />
-    </TabBar>
+    <!-- 🔐 Direct navigation routes -->
+    <ShellContent Route="login" ContentTemplate="{DataTemplate pages:LoginPage}" />
+    <ShellContent Route="main" ContentTemplate="{DataTemplate pages:RecordingPage}" />
+    <ShellContent Route="history" ContentTemplate="{DataTemplate pages:SessionHistoryPage}" />
+
 </Shell>
