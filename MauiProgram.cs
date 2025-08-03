@@ -17,54 +17,71 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
 
         builder
-            .UseMauiApp(services => services.GetRequiredService<App>())
+            .UseMauiApp<App>()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // 🔧 Register core services
-        builder.Services.AddSingleton<UserRepository>(); // Required by AuthService
+        // 🔧 Core services
+        builder.Services.AddSingleton<UserRepository>();
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddSingleton<FileStorageService>();
         builder.Services.AddSingleton<CommunicationService>();
         builder.Services.AddSingleton<PipeServerService>();
 
-        // 🎙️ Audio and Recording
+        // 🎙️ Audio capture and recording
         builder.Services.AddSingleton<IAudioCaptureService, MockAudioCaptureService>();
         builder.Services.AddSingleton<IRecordingService, RecordingService>();
         builder.Services.AddSingleton<RecordingUploadService>();
 
-        // 🗂️ SQLite-backed session database
+        // 🗂️ SQLite database
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "sessions.db");
         builder.Services.AddSingleton(provider => new SessionDatabase(dbPath));
 
-        // 📄 Register pages
+        // 📄 Pages
         builder.Services.AddTransient<RecordingPage>();
+        builder.Services.AddTransient<LoginPage>(); // Ensure your LoginPage exists
 
-        // 🌿 Root app setup
+        // 🌿 App with dependencies
         builder.Services.AddSingleton<App>(provider =>
         {
             var db = provider.GetRequiredService<SessionDatabase>();
-            var app = new App(db);
+            var audioService = provider.GetRequiredService<IAudioCaptureService>();
 
+            var app = new App(db, audioService);
+
+            // 👀 Initial splash page with logo
             app.MainPage = new ContentPage
             {
-                Content = new Label
+                Content = new Image
                 {
-                    Text = "Test page loaded successfully ✅",
+                    Source = "logo.png", // Make sure logo.png is in Resources/Images and marked as MauiImage
                     HorizontalOptions = LayoutOptions.Center,
-                    VerticalOptions = LayoutOptions.Center
-                }
+                    VerticalOptions = LayoutOptions.Center,
+                    WidthRequest = 200,
+                    HeightRequest = 200
+                },
+                BackgroundColor = Colors.White
             };
+
+            // ⏳ Transition to LoginPage after a short delay
+            Task.Run(async () =>
+            {
+                await Task.Delay(2000); // 2 seconds splash
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    app.MainPage = new LoginPage();
+                });
+            });
 
             return app;
         });
 
         var app = builder.Build();
 
-        // 🚀 Launch background listener
+        // 🚀 Background listener
         var pipeServer = app.Services.GetRequiredService<PipeServerService>();
         Task.Run(() => pipeServer.StartListenerAsync());
 

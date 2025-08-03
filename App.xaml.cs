@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
+using ProVoiceLedger.Pages;
 using System.Diagnostics;
 using System.IO;
 
@@ -9,29 +10,24 @@ namespace ProVoiceLedger;
 public partial class App : Application
 {
     private readonly SessionDatabase _sessionDb;
+    private readonly IAudioCaptureService _audioService;
 
-    public App(SessionDatabase db)
+    public App(SessionDatabase db, IAudioCaptureService audioCaptureService)
     {
-        _sessionDb = db; // Safe to assign first
+        _sessionDb = db;
+        _audioService = audioCaptureService;
 
         try
         {
             LogMessage("🪵 Begin App constructor");
 
-            InitializeComponent(); // ❓ May fail due to XAML issues
+            InitializeComponent();
             LogMessage("✅ InitializeComponent succeeded");
 
-            MainPage = new ContentPage
-            {
-                Content = new Label
-                {
-                    Text = "App launched successfully 🎉",
-                    HorizontalOptions = LayoutOptions.Center,
-                    VerticalOptions = LayoutOptions.Center
-                }
-            };
+            // 🚀 Load SplashPage to show logo + version before redirecting to LoginPage
+            MainPage = new SplashPage();
 
-            LogMessage("🧭 MainPage set");
+            LogMessage("🖼️ SplashPage assigned to MainPage");
         }
         catch (Exception ex)
         {
@@ -56,6 +52,7 @@ public partial class App : Application
     }
 
     public SessionDatabase SessionDb => _sessionDb;
+    public IAudioCaptureService AudioService => _audioService;
 
     private void LogMessage(string message)
     {

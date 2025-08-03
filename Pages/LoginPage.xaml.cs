@@ -13,15 +13,23 @@ public partial class LoginPage : ContentPage
     public LoginPage()
     {
         InitializeComponent();
-        _httpClient = new HttpClient(); // Consider DI later if needed
+        _httpClient = new HttpClient(); // Optional: Use dependency injection for future flexibility
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
-        string username = UsernameEntry?.Text ?? string.Empty;
+        // 🧠 Safely get text input, trim spaces
+        string username = UsernameEntry?.Text?.Trim() ?? string.Empty;
         string password = PasswordEntry?.Text ?? string.Empty;
 
-        var request = new LoginRequest
+        // 🚫 Validate fields
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            await DisplayAlert("Missing Input", "Please enter both a username and password.", "OK");
+            return;
+        }
+
+        var loginRequest = new LoginRequest
         {
             Username = username,
             Password = password
@@ -30,21 +38,25 @@ public partial class LoginPage : ContentPage
         try
         {
             string loginUrl = "https://localhost:7071/api/auth/login";
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync(loginUrl, request);
+
+            // 📡 Send login request to server
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync(loginUrl, loginRequest);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                if (result != null && result.Success)
-                {
-                    await DisplayAlert("Welcome", $"Role: {result.Role}", "OK");
+                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
 
-                    // TODO: Store token, navigate to main page, or personalize experience
+                if (loginResponse?.Success == true)
+                {
+                    await DisplayAlert("Welcome", $"Role: {loginResponse.Role}", "OK");
+
+                    // 📝 TODO: Store token securely if returned
+                    // Navigation to main page or user dashboard
                     await Shell.Current.GoToAsync("main");
                 }
                 else
                 {
-                    await DisplayAlert("Login Failed", result?.Message ?? "Invalid credentials", "Retry");
+                    await DisplayAlert("Login Failed", loginResponse?.Message ?? "Invalid credentials", "Retry");
                 }
             }
             else
@@ -54,7 +66,7 @@ public partial class LoginPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Network Error", ex.Message, "Close");
+            await DisplayAlert("Network Error", $"Unable to reach server: {ex.Message}", "Close");
         }
     }
 }

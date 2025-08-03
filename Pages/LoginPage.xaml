@@ -2,15 +2,61 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProVoiceLedger.Pages.LoginPage"
-             BackgroundColor="White">
+             BackgroundColor="#f8f9fa"
+             Title="Login">
 
     <VerticalStackLayout Padding="24" Spacing="16">
-        <Label Text="Sign In" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
 
-        <Entry x:Name="UsernameEntry" Placeholder="Username" />
-        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
+        <!-- 🧾 Page Title -->
+        <Label Text="Sign In"
+               FontSize="26"
+               FontAttributes="Bold"
+               TextColor="#333"
+               HorizontalOptions="Center" />
 
-        <Button Text="Login" Clicked="OnLoginClicked" BackgroundColor="#3498db" TextColor="White" />
+        <!-- 👤 Username Label & Entry -->
+        <Label Text="Username"
+               FontSize="14"
+               TextColor="#555"
+               Margin="0,8,0,0" />
+        <Frame CornerRadius="6"
+               BorderColor="#d3d3d3"
+               BackgroundColor="#ffffff"
+               Padding="6"
+               HasShadow="False">
+            <Entry x:Name="UsernameEntry"
+                   Placeholder="Enter your username"
+                   BackgroundColor="Transparent"
+                   TextColor="#333" />
+        </Frame>
+
+        <!-- 🔒 Password Label & Entry -->
+        <Label Text="Password"
+               FontSize="14"
+               TextColor="#555"
+               Margin="0,12,0,0" />
+        <Frame CornerRadius="6"
+               BorderColor="#d3d3d3"
+               BackgroundColor="#ffffff"
+               Padding="6"
+               HasShadow="False">
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="Enter your password"
+                   IsPassword="True"
+                   BackgroundColor="Transparent"
+                   TextColor="#333" />
+        </Frame>
+
+        <!-- 🚀 Login Button -->
+        <Button Text="Login"
+                x:Name="LoginButton"
+                Clicked="OnLoginClicked"
+                BackgroundColor="#5dade2"
+                TextColor="White"
+                CornerRadius="12"
+                HeightRequest="46"
+                FontAttributes="Bold"
+                Margin="0,24,0,0" />
+
     </VerticalStackLayout>
-
 </ContentPage>
