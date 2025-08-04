@@ -7,6 +7,13 @@
 
     <VerticalStackLayout Padding="24" Spacing="16">
 
+        <!-- 🖼 Logo Image -->
+        <Image Source="logoimage.png"
+               HeightRequest="200"
+               WidthRequest="200"
+               HorizontalOptions="Center"
+               Margin="0,24,0,0" />
+
         <!-- 🧾 Page Title -->
         <Label Text="Sign In"
                FontSize="26"

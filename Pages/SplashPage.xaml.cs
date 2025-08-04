@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Microsoft.Maui.Controls;
-using ProVoiceLedger.Core.Services;
 
 namespace ProVoiceLedger.Pages;
 
@@ -14,13 +13,26 @@ public partial class SplashPage : ContentPage
 
         AppVersion = $"Version: {Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "unknown"}";
         BindingContext = this;
-
-        StartLoginTransition();
     }
 
-    private async void StartLoginTransition()
+    protected override async void OnAppearing()
     {
-        await Task.Delay(2000); // 🕒 Display splash for 2 seconds
-        Application.Current.MainPage = new LoginPage(); // 🔐 Load login screen
+        base.OnAppearing();
+
+        // ⬇️ Fade in
+        await SplashLogo.FadeTo(1, 1000, Easing.CubicIn);
+        await Task.Delay(600); // Let logo settle
+
+        // 🧭 Animate move-up and scale-down
+        var targetY = -200; // Roughly matches LoginPage logo position
+        await Task.WhenAll(
+            SplashLogo.ScaleTo(0.5, 1000, Easing.SinInOut),    // Scale to roughly 150px size
+            SplashLogo.TranslateTo(0, targetY, 1000, Easing.SinInOut)
+        );
+
+        //await Task.Delay(200); // Optional pause
+
+        // 🚀 Transition to login page
+        Application.Current.MainPage = new LoginPage();
     }
 }

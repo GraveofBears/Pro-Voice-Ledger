@@ -4,14 +4,22 @@
              x:Class="ProVoiceLedger.Pages.SplashPage"
              BackgroundColor="White">
 
-    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Image Source="logoimage.png"
-               WidthRequest="200"
-               HeightRequest="200" />
-        <Label Text="{Binding AppVersion}"
+	<Grid>
+		<!-- Logo starts centered -->
+		<Image x:Name="SplashLogo"
+               Source="logoimage.png"
+               WidthRequest="400"
+               HeightRequest="400"
+               Opacity="0"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+		<!-- App Version Text -->
+		<Label Text="{Binding AppVersion}"
                FontSize="14"
                TextColor="Gray"
-               Margin="0,12,0,0"
-               HorizontalOptions="Center" />
-    </StackLayout>
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Padding="0,0,0,24" />
+	</Grid>
 </ContentPage>
