@@ -19,6 +19,7 @@ public partial class AppShell : Shell
 
             InitializeComponent();
 
+            // Optional named routes (can still use for direct GoToAsync navigation)
             Routing.RegisterRoute("login", typeof(Pages.LoginPage));
             Routing.RegisterRoute("main", typeof(Pages.RecordingPage));
             Routing.RegisterRoute("history", typeof(Pages.SessionHistoryPage));

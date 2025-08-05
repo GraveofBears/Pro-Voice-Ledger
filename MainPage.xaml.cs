@@ -3,7 +3,6 @@ using Microsoft.Maui.ApplicationModel;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
@@ -15,7 +14,7 @@ public partial class MainPage : ContentPage
 {
     private readonly IAudioCaptureService _audioCaptureService;
     private readonly SessionDatabase _sessionDb;
-    private readonly HttpClient _httpClient;
+    private readonly LoginService _loginService;
 
     private int _count = 0;
     private readonly List<string> _iconSequence = new()
@@ -28,7 +27,9 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         _audioCaptureService = audioCaptureService;
         _sessionDb = sessionDb;
-        _httpClient = new HttpClient();
+
+        var httpClient = new HttpClient();
+        _loginService = new LoginService(httpClient);
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)
@@ -36,7 +37,6 @@ public partial class MainPage : ContentPage
         string username = UsernameEntry?.Text ?? string.Empty;
         string password = PasswordEntry?.Text ?? string.Empty;
 
-        var loginUrl = "https://localhost:7290/api/auth/login";
         var request = new LoginRequest
         {
             Username = username,
@@ -45,31 +45,22 @@ public partial class MainPage : ContentPage
 
         try
         {
-            var response = await _httpClient.PostAsJsonAsync(loginUrl, request);
-            if (response.IsSuccessStatusCode)
+            var result = await _loginService.AttemptLoginAsync(request);
+            if (result?.Success == true)
             {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                if (result?.Success == true)
+                var user = new User
                 {
-                    var user = new User
-                    {
-                        Username = username,
-                        Role = result.Role,
-                        IsSuspended = result.Role == "Suspended", // Optional logic
-                        //Token = result.Token
-                    };
+                    Username = username,
+                    Role = result.Role,
+                    IsSuspended = result.Role == "Suspended"
+                };
 
-                    var recordingPage = new RecordingPage(_audioCaptureService, _sessionDb, user);
-                    Application.Current.MainPage = new NavigationPage(recordingPage);
-                }
-                else
-                {
-                    await DisplayAlert("Login Failed", result?.Message ?? "Invalid credentials", "Try Again");
-                }
+                var recordingPage = new RecordingPage(_audioCaptureService, _sessionDb, user);
+                Application.Current.MainPage = new NavigationPage(recordingPage);
             }
             else
             {
-                await DisplayAlert("Server Error", $"Code: {response.StatusCode}", "Close");
+                await DisplayAlert("Login Failed", result?.Message ?? "Invalid credentials", "Try Again");
             }
         }
         catch (Exception ex)
@@ -91,10 +82,10 @@ public partial class MainPage : ContentPage
             ShowRecordingVisuals();
 
             var metadata = new Dictionary<string, string>
-        {
-            { "TriggeredBy", "MainPage" },
-            { "Device", "MockMic" }
-        };
+            {
+                { "TriggeredBy", "MainPage" },
+                { "Device", "MockMic" }
+            };
 
             bool started = await _audioCaptureService.StartRecordingAsync(sessionName, metadata);
             if (started)

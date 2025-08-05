@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
 using ProVoiceLedger.Pages;
@@ -24,10 +25,48 @@ public partial class App : Application
             InitializeComponent();
             LogMessage("✅ InitializeComponent succeeded");
 
-            // 🚀 Load SplashPage to show logo + version before redirecting to LoginPage
+            // 🚀 Set SplashPage first, then try restoring user session
             MainPage = new SplashPage();
-
             LogMessage("🖼️ SplashPage assigned to MainPage");
+
+            // 💾 Attempt restore after short delay
+            Task.Run(async () =>
+            {
+                await Task.Delay(1500); // Optional delay to show splash
+
+                string? token = null;
+                try
+                {
+                    token = await SecureStorage.GetAsync("auth_token");
+                    LogMessage(token != null ? "🔓 Token retrieved from SecureStorage" : "🔐 No token found");
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"⚠️ Token restore failed: {ex.Message}");
+                }
+
+                // ⛳ Show appropriate page based on token
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        var user = new User
+                        {
+                            Username = "RestoredUser",
+                            Role = "User",
+                            IsSuspended = false
+                        };
+
+                        MainPage = new NavigationPage(new RecordingPage(_audioService, _sessionDb, user));
+                        LogMessage("📼 RecordingPage assigned (session restored)");
+                    }
+                    else
+                    {
+                        MainPage = new MainPage(_audioService, _sessionDb);
+                        LogMessage("🔑 MainPage assigned (manual login required)");
+                    }
+                });
+            });
         }
         catch (Exception ex)
         {

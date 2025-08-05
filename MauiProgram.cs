@@ -32,7 +32,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<PipeServerService>();
 
         // 🎙️ Audio capture and recording
-        builder.Services.AddSingleton<IAudioCaptureService, MockAudioCaptureService>();
+        builder.Services.AddSingleton<IAudioCaptureService, AudioCaptureService>();
         builder.Services.AddSingleton<IRecordingService, RecordingService>();
         builder.Services.AddSingleton<RecordingUploadService>();
 

@@ -1,0 +1,115 @@
+﻿#if ANDROID
+using Android.Media;
+using ProVoiceLedger.Core.Models;
+using ProVoiceLedger.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ProVoiceLedger.Platforms.Android
+{
+    public class AndroidAudioCaptureService : IAudioCaptureService
+    {
+        private AudioRecord? _audioRecord;
+        private FileStream? _outputStream;
+        private CancellationTokenSource? _recordingTokenSource;
+        private string? _filePath;
+        private DateTime _startTime;
+        private bool _isRecording;
+        private string? _sessionName;
+        private Dictionary<string, string>? _metadata;
+
+        public bool IsRecording => _isRecording;
+        public event Action<float[]>? OnAudioSampleCaptured;
+
+        private const int SampleRate = 44100;
+        private const int BufferSize = 2048;
+
+        public async Task<bool> StartRecordingAsync(string sessionName, Dictionary<string, string>? metadata = null)
+        {
+            var status = await Permissions.RequestAsync<Permissions.Microphone>();
+            if (status != PermissionStatus.Granted)
+                return false;
+
+            _sessionName = sessionName;
+            _metadata = metadata;
+            _startTime = DateTime.Now;
+            _isRecording = true;
+
+            var dir = Path.Combine(FileSystem.AppDataDirectory, "Recordings");
+            Directory.CreateDirectory(dir);
+            _filePath = Path.Combine(dir, $"{sessionName}_{_startTime:yyyyMMdd_HHmmss}.pcm");
+
+            _outputStream = new FileStream(_filePath, FileMode.Create, FileAccess.Write);
+            _audioRecord = new AudioRecord(
+                AudioSource.Mic,
+                SampleRate,
+                ChannelIn.Mono,
+                Encoding.Pcm16bit,
+                BufferSize
+            );
+
+            _audioRecord.StartRecording();
+            _recordingTokenSource = new CancellationTokenSource();
+
+            _ = Task.Run(() => CaptureLoop(_recordingTokenSource.Token));
+
+            return true;
+        }
+
+        public async Task<RecordedClipInfo?> StopRecordingAsync()
+        {
+            if (!_isRecording) return null;
+
+            _isRecording = false;
+            _recordingTokenSource?.Cancel();
+
+            _audioRecord?.Stop();
+            _audioRecord?.Release();
+            _audioRecord = null;
+
+            await _outputStream?.FlushAsync()!;
+            _outputStream?.Dispose();
+            _outputStream = null;
+
+            var duration = DateTime.Now - _startTime;
+            var timestamp = DateTime.Now;
+
+            return new RecordedClipInfo
+            {
+                FilePath = _filePath ?? string.Empty,
+                Duration = duration,
+                SessionName = _sessionName ?? string.Empty,
+                Timestamp = timestamp,
+                Metadata = _metadata,
+                RecordedAt = timestamp,
+                DeviceUsed = "Android Mic"
+            };
+        }
+
+        private void CaptureLoop(CancellationToken token)
+        {
+            var buffer = new byte[BufferSize];
+
+            while (!token.IsCancellationRequested)
+            {
+                int read = _audioRecord?.Read(buffer, 0, buffer.Length) ?? 0;
+                if (read <= 0) continue;
+
+                _outputStream?.Write(buffer, 0, read);
+
+                float[] samples = new float[read / 2];
+                for (int i = 0; i < samples.Length; i++)
+                {
+                    short sample = BitConverter.ToInt16(buffer, i * 2);
+                    samples[i] = sample / 32768f; // normalize to [-1,1]
+                }
+
+                OnAudioSampleCaptured?.Invoke(samples);
+            }
+        }
+    }
+}
+#endif

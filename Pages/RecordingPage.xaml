@@ -2,46 +2,79 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
     x:Class="ProVoiceLedger.Pages.RecordingPage"
-    Title="Record Session"
-    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    Title="Dictate"
+    BackgroundColor="#FAFAFA">
 
-    <VerticalStackLayout Padding="24" Spacing="20">
+    <VerticalStackLayout Padding="24" Spacing="22">
 
-        <Label Text="Session Name"
-               FontSize="Medium"
-               HorizontalOptions="Center" />
+        <!-- 🧾 Session Input -->
+        <Frame BackgroundColor="#FFFFFF" CornerRadius="8" Padding="16" HasShadow="True">
+            <VerticalStackLayout>
+                <Label Text="Session Name"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="#333"
+                       HorizontalOptions="Start" />
+                <Entry x:Name="SessionNameEntry"
+                       Placeholder="Enter session name"
+                       FontSize="14"
+                       BackgroundColor="#F3F3F3"
+                       TextColor="#000"
+                       Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </Frame>
 
-        <Entry x:Name="SessionNameEntry"
-               Placeholder="Enter session name"
-               HorizontalOptions="FillAndExpand" />
+        <!-- 📈 Live Waveform Display -->
+        <Frame BackgroundColor="#FFFFFF" CornerRadius="8" Padding="10" HasShadow="True">
+            <skia:SKCanvasView x:Name="WaveformView"
+                               HeightRequest="100"
+                               BackgroundColor="#EEEEEE"
+                               PaintSurface="OnWaveformPaint" />
+        </Frame>
 
-        <Image x:Name="RecordingIndicator"
-               Source="mic_icon.png"
-               WidthRequest="64"
-               HeightRequest="64"
-               HorizontalOptions="Center" />
+        <!-- 🎙️ Recording Indicator + Controls -->
+        <Frame BackgroundColor="#FFFFFF" CornerRadius="8" Padding="20" HasShadow="True">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="20">
 
-        <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
-            <Button Text="Start"
-                    IsEnabled="{Binding IsNotRecording}"
-                    Clicked="OnStartRecordingClicked"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White" />
+                <Image x:Name="RecordingIndicator"
+                       Grid.Row="0" Grid.ColumnSpan="2"
+                       Source="mic_icon.png"
+                       WidthRequest="72"
+                       HeightRequest="72"
+                       HorizontalOptions="Center"
+                       Margin="0,10" />
 
-            <Button Text="Stop"
-                    IsEnabled="{Binding IsRecording}"
-                    Clicked="OnStopRecordingClicked"
-                    BackgroundColor="#F44336"
-                    TextColor="White" />
-        </HorizontalStackLayout>
+                <Button Text="Start"
+                        Grid.Row="1" Grid.Column="0"
+                        IsEnabled="{Binding IsNotRecording}"
+                        Clicked="OnStartRecordingClicked"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="6"
+                        FontAttributes="Bold"
+                        HeightRequest="48" />
 
+                <Button Text="Stop"
+                        Grid.Row="1" Grid.Column="1"
+                        IsEnabled="{Binding IsRecording}"
+                        Clicked="OnStopRecordingClicked"
+                        BackgroundColor="#E53935"
+                        TextColor="White"
+                        CornerRadius="6"
+                        FontAttributes="Bold"
+                        HeightRequest="48" />
+            </Grid>
+        </Frame>
+
+        <!-- ℹ️ Recording Summary -->
         <Label Text="{Binding LastSessionInfo}"
-               FontSize="Small"
+               FontSize="14"
                TextColor="#666"
                HorizontalOptions="Center"
-               Margin="10"/>
+               Margin="10"
+               LineBreakMode="WordWrap" />
 
     </VerticalStackLayout>
-
 </ContentPage>
