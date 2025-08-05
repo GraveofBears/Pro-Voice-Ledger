@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- 🔧 Project Setup -->
   <PropertyGroup>
     <TargetFrameworks>net8.0-windows;net8.0-android</TargetFrameworks>
     <UseMaui>true</UseMaui>
@@ -10,7 +9,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>ProVoiceLedger</RootNamespace>
 
-    <!-- 🪪 App Identity -->
+    <!-- App Identity -->
     <ApplicationTitle>ProVoiceLedger</ApplicationTitle>
     <ApplicationId>com.companyname.provoiceledger</ApplicationId>
     <ApplicationIdGuid>0bef1ded-7839-43c0-8396-7773082f3dca</ApplicationIdGuid>
@@ -18,43 +17,44 @@
     <ApplicationVersion>1</ApplicationVersion>
   </PropertyGroup>
 
-  <!-- 🪟 Windows Platform Setup -->
+  <!-- Windows Platform -->
   <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-windows'">
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
-	<WindowsPackageType>None</WindowsPackageType>
+    <WindowsPackageType>None</WindowsPackageType>
     <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
-  <!-- 📱 Android Platform Setup -->
+  <!-- Android Platform -->
   <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-android'">
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <AndroidSdkDirectory>C:\Users\GraveBear\AppData\Local\Android\Sdk</AndroidSdkDirectory>
   </PropertyGroup>
 
-  <!-- 📦 Dependencies -->
+  <!-- Dependencies -->
   <ItemGroup>
     <!-- MAUI Core -->
     <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
     <PackageReference Include="Microsoft.Maui.Core" Version="8.0.100" />
     <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.100" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
-	<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.3" />
-
 
     <!-- .NET Extensions -->
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="SkiaSharp" Version="3.119.0" />
 
-    <!-- SQLite -->
+    <!-- Multimedia & UI -->
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.3" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+
+    <!-- Database -->
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 
-  <!-- 🎨 UI Assets -->
+  <!-- App Assets -->
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -64,19 +64,12 @@
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <!-- 📜 XAML Views -->
+  <!-- Registered XAML Pages -->
   <ItemGroup>
-    <MauiXaml Update="Pages\LoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\SplashPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Pages\SplashPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
+    <MauiXaml Update="Pages\LoginPage.xaml" />
+    <MauiXaml Update="Pages\SplashPage.xaml" />
+    <MauiXaml Update="Pages\MainPage.xaml" />
+    <MauiXaml Update="Pages\RecordingPage.xaml" />
   </ItemGroup>
 
 </Project>

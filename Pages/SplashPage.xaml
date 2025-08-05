@@ -4,22 +4,23 @@
              x:Class="ProVoiceLedger.Pages.SplashPage"
              BackgroundColor="White">
 
-	<Grid>
-		<!-- Logo starts centered -->
-		<Image x:Name="SplashLogo"
+    <Grid>
+        <!-- 🌟 Animated Logo: renamed for code-behind match -->
+        <Image x:Name="LogoImage"
                Source="logoimage.png"
-               WidthRequest="400"
-               HeightRequest="400"
+               WidthRequest="250"
+               HeightRequest="250"
                Opacity="0"
                HorizontalOptions="Center"
-               VerticalOptions="Center" />
+               VerticalOptions="Center"
+               Margin="0,-20,0,0" />
 
-		<!-- App Version Text -->
-		<Label Text="{Binding AppVersion}"
+        <!-- 🔍 App Version -->
+        <Label Text="{Binding AppVersion}"
                FontSize="14"
                TextColor="Gray"
                HorizontalOptions="Center"
                VerticalOptions="End"
                Padding="0,0,0,24" />
-	</Grid>
+    </Grid>
 </ContentPage>

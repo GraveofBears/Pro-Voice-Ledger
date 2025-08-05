@@ -10,14 +10,11 @@ namespace ProVoiceLedger;
 
 public partial class App : Application
 {
-    private readonly SessionDatabase _sessionDb;
-    private readonly IAudioCaptureService _audioService;
+    public static SessionDatabase SessionDb { get; private set; } = default!;
+    public static IAudioCaptureService AudioService { get; private set; } = default!;
 
     public App(SessionDatabase db, IAudioCaptureService audioCaptureService)
     {
-        _sessionDb = db;
-        _audioService = audioCaptureService;
-
         try
         {
             LogMessage("🪵 Begin App constructor");
@@ -25,14 +22,18 @@ public partial class App : Application
             InitializeComponent();
             LogMessage("✅ InitializeComponent succeeded");
 
-            // 🚀 Set SplashPage first, then try restoring user session
+            // 🧩 Store services in static properties for global access
+            SessionDb = db;
+            AudioService = audioCaptureService;
+
+            // 🚀 Set SplashPage first
             MainPage = new SplashPage();
             LogMessage("🖼️ SplashPage assigned to MainPage");
 
             // 💾 Attempt restore after short delay
             Task.Run(async () =>
             {
-                await Task.Delay(1500); // Optional delay to show splash
+                await Task.Delay(1500); // Optional splash delay
 
                 string? token = null;
                 try
@@ -45,7 +46,6 @@ public partial class App : Application
                     LogMessage($"⚠️ Token restore failed: {ex.Message}");
                 }
 
-                // ⛳ Show appropriate page based on token
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     if (!string.IsNullOrEmpty(token))
@@ -57,13 +57,13 @@ public partial class App : Application
                             IsSuspended = false
                         };
 
-                        MainPage = new NavigationPage(new RecordingPage(_audioService, _sessionDb, user));
+                        MainPage = new NavigationPage(new RecordingPage(AudioService, SessionDb, user));
                         LogMessage("📼 RecordingPage assigned (session restored)");
                     }
                     else
                     {
-                        MainPage = new MainPage(_audioService, _sessionDb);
-                        LogMessage("🔑 MainPage assigned (manual login required)");
+                        MainPage = new NavigationPage(new LoginPage());
+                        LogMessage("🔑 LoginPage assigned (manual login required)");
                     }
                 });
             });
@@ -89,9 +89,6 @@ public partial class App : Application
 
         LogMessage("🏁 End of App constructor");
     }
-
-    public SessionDatabase SessionDb => _sessionDb;
-    public IAudioCaptureService AudioService => _audioService;
 
     private void LogMessage(string message)
     {

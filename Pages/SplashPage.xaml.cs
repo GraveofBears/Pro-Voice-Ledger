@@ -1,38 +1,44 @@
-﻿using System.Reflection;
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
+using System;
+using System.Threading.Tasks;
 
-namespace ProVoiceLedger.Pages;
-
-public partial class SplashPage : ContentPage
+namespace ProVoiceLedger.Pages
 {
-    public string AppVersion { get; set; }
-
-    public SplashPage()
+    public partial class SplashPage : ContentPage
     {
-        InitializeComponent();
+        public SplashPage()
+        {
+            InitializeComponent();
+        }
 
-        AppVersion = $"Version: {Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "unknown"}";
-        BindingContext = this;
-    }
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
+            await AnimateLogoIntro();
 
-        // ⬇️ Fade in
-        await SplashLogo.FadeTo(1, 1000, Easing.CubicIn);
-        await Task.Delay(600); // Let logo settle
+            // 🌟 Optional delay for dramatic effect
+            await Task.Delay(900);
 
-        // 🧭 Animate move-up and scale-down
-        var targetY = -200; // Roughly matches LoginPage logo position
-        await Task.WhenAll(
-            SplashLogo.ScaleTo(0.5, 1000, Easing.SinInOut),    // Scale to roughly 150px size
-            SplashLogo.TranslateTo(0, targetY, 1000, Easing.SinInOut)
-        );
+            // 🚀 Navigate to LoginPage with stacked transition
+            await Navigation.PushAsync(new LoginPage());
+        }
 
-        //await Task.Delay(200); // Optional pause
+        private async Task AnimateLogoIntro()
+        {
+            if (LogoImage == null) return;
 
-        // 🚀 Transition to login page
-        Application.Current.MainPage = new LoginPage();
+            // 🌀 Start with initial scale and fade
+            LogoImage.Opacity = 0;
+            LogoImage.Scale = 0.5;
+
+            // 🎬 Smooth fade-in and scale-up animation
+            await LogoImage.FadeTo(1, 700, Easing.CubicInOut);
+            await LogoImage.ScaleTo(1.0, 700, Easing.CubicInOut);
+
+            // ✨ Optional bounce effect (can be disabled for subtlety)
+            await LogoImage.ScaleTo(1.05, 150, Easing.SinOut);
+            await LogoImage.ScaleTo(1.0, 150, Easing.SinIn);
+        }
     }
 }

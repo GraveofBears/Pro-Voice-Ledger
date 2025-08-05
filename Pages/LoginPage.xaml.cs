@@ -1,72 +1,68 @@
-﻿using System;
+﻿using Microsoft.Maui.Controls;
+using System;
 using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.Maui.Controls;
+using System.Threading.Tasks;
 using ProVoiceLedger.Core.Models;
+using ProVoiceLedger.Core.Services;
+using ProVoiceLedger.Pages;
 
-namespace ProVoiceLedger.Pages;
-
-public partial class LoginPage : ContentPage
+namespace ProVoiceLedger.Pages
 {
-    private readonly HttpClient _httpClient;
-
-    public LoginPage()
+    public partial class LoginPage : ContentPage
     {
-        InitializeComponent();
-        _httpClient = new HttpClient(); // Optional: Use dependency injection for future flexibility
-    }
+        private readonly LoginService _loginService;
 
-    private async void OnLoginClicked(object sender, EventArgs e)
-    {
-        // 🧠 Safely get text input, trim spaces
-        string username = UsernameEntry?.Text?.Trim() ?? string.Empty;
-        string password = PasswordEntry?.Text ?? string.Empty;
-
-        // 🚫 Validate fields
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        public LoginPage()
         {
-            await DisplayAlert("Missing Input", "Please enter both a username and password.", "OK");
-            return;
+            InitializeComponent();
+
+            // 🔧 HttpClient setup
+            var httpClient = new HttpClient();
+            _loginService = new LoginService(httpClient);
         }
 
-        var loginRequest = new LoginRequest
+        private async void OnLoginButtonClicked(object sender, EventArgs e)
         {
-            Username = username,
-            Password = password
-        };
+            // ✅ These match named controls in the XAML
+            string username = UsernameEntry?.Text?.Trim() ?? string.Empty;
+            string password = PasswordEntry?.Text?.Trim() ?? string.Empty;
 
-        try
-        {
-            string loginUrl = "https://localhost:7290/api/auth/login";
-
-            // 📡 Send login request to server
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync(loginUrl, loginRequest);
-
-            if (response.IsSuccessStatusCode)
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                await DisplayAlert("Missing Info", "Please enter both username and password.", "OK");
+                return;
+            }
 
-                if (loginResponse?.Success == true)
+            var request = new LoginRequest
+            {
+                Username = username,
+                Password = password
+            };
+
+            try
+            {
+                var result = await _loginService.AttemptLoginAsync(request);
+                if (result?.Success == true)
                 {
-                    await DisplayAlert("Welcome", $"Role: {loginResponse.Role}", "OK");
+                    var user = new User
+                    {
+                        Username = username,
+                        Role = result.Role ?? "User", // 🔧 Avoid null assignment
+                        IsSuspended = result.Role == "Suspended"
+                    };
 
-                    // 📝 TODO: Store token securely if returned
-                    // Navigation to main page or user dashboard
-                    await Shell.Current.GoToAsync("main");
+                    var recordingPage = new RecordingPage(App.AudioService, App.SessionDb, user);
+                    await Navigation.PushAsync(recordingPage);
                 }
                 else
                 {
-                    await DisplayAlert("Login Failed", loginResponse?.Message ?? "Invalid credentials", "Retry");
+                    await DisplayAlert("Login Failed", result?.Message ?? "Invalid credentials", "Try Again");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                await DisplayAlert("Server Error", $"Status code: {response.StatusCode}", "Close");
+                await DisplayAlert("Error", $"Login error: {ex.Message}", "Close");
             }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Network Error", $"Unable to reach server: {ex.Message}", "Close");
         }
     }
 }

@@ -32,6 +32,8 @@ public partial class MainPage : ContentPage
         _loginService = new LoginService(httpClient);
     }
 
+    // ⛔ Removed OnAppearing override that resets MainPage to SplashPage
+
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         string username = UsernameEntry?.Text ?? string.Empty;
@@ -56,7 +58,9 @@ public partial class MainPage : ContentPage
                 };
 
                 var recordingPage = new RecordingPage(_audioCaptureService, _sessionDb, user);
-                Application.Current.MainPage = new NavigationPage(recordingPage);
+
+                // ✅ Use navigation instead of root replacement
+                await Navigation.PushAsync(recordingPage);
             }
             else
             {
