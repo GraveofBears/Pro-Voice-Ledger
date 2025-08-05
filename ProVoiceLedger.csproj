@@ -63,6 +63,9 @@
     <MauiFont Include="Resources\Fonts\*" />
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="App.xaml~RF1605234c.TMP" />
+  </ItemGroup>
 
   <!-- Registered XAML Pages -->
   <ItemGroup>

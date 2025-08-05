@@ -1,10 +1,10 @@
 ﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
-using ProVoiceLedger.Pages;
 
 namespace ProVoiceLedger.Pages
 {
@@ -16,14 +16,12 @@ namespace ProVoiceLedger.Pages
         {
             InitializeComponent();
 
-            // 🔧 HttpClient setup
             var httpClient = new HttpClient();
             _loginService = new LoginService(httpClient);
         }
 
         private async void OnLoginButtonClicked(object sender, EventArgs e)
         {
-            // ✅ These match named controls in the XAML
             string username = UsernameEntry?.Text?.Trim() ?? string.Empty;
             string password = PasswordEntry?.Text?.Trim() ?? string.Empty;
 
@@ -47,12 +45,24 @@ namespace ProVoiceLedger.Pages
                     var user = new User
                     {
                         Username = username,
-                        Role = result.Role ?? "User", // 🔧 Avoid null assignment
+                        Role = result.Role ?? "User",
                         IsSuspended = result.Role == "Suspended"
                     };
 
+                    // 🗝️ Save token (assuming result.Token is available)
+                    try
+                    {
+                        await SecureStorage.SetAsync("auth_token", result.Token ?? string.Empty);
+                    }
+                    catch (Exception tokenEx)
+                    {
+                        Console.WriteLine($"Token save failed: {tokenEx.Message}");
+                    }
+
                     var recordingPage = new RecordingPage(App.AudioService, App.SessionDb, user);
-                    await Navigation.PushAsync(recordingPage);
+
+                    // 🪄 Replace MainPage instead of pushing on top
+                    Application.Current.MainPage = new NavigationPage(recordingPage);
                 }
                 else
                 {

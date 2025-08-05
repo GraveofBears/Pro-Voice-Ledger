@@ -23,7 +23,7 @@
                 HorizontalOptions="Center"
                 Margin="0,0,0,12"/>
 
-            <CollectionView ItemsSource="{Binding Sessions}">
+            <CollectionView x:Name="SessionsView" ItemsSource="{Binding Sessions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame 

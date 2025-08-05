@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -11,8 +11,8 @@ namespace ProVoiceLedger.Pages
     {
         private readonly SessionDatabase _sessionDb;
 
-        private List<Session> _sessions = new();
-        public List<Session> Sessions
+        private ObservableCollection<Session> _sessions = new();
+        public ObservableCollection<Session> Sessions
         {
             get => _sessions;
             set
@@ -30,6 +30,11 @@ namespace ProVoiceLedger.Pages
             InitializeComponent();
             _sessionDb = sessionDb;
             BindingContext = this;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
             LoadSessions();
         }
 
@@ -39,7 +44,7 @@ namespace ProVoiceLedger.Pages
             {
                 var savedSessions = await _sessionDb.GetSessionsAsync();
                 if (savedSessions != null)
-                    Sessions = savedSessions;
+                    Sessions = new ObservableCollection<Session>(savedSessions);
             }
             catch (Exception ex)
             {
