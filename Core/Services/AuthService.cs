@@ -1,5 +1,6 @@
-﻿using System;
+﻿using BCrypt.Net;
 using ProVoiceLedger.Core.Models;
+using System;
 
 namespace ProVoiceLedger.Core.Services
 {
@@ -38,7 +39,9 @@ namespace ProVoiceLedger.Core.Services
                 };
             }
 
-            if (user.PasswordHash != request.Password)
+            // ✅ Secure password verification using bcrypt
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+            if (!isPasswordValid)
             {
                 return new LoginResponse
                 {
