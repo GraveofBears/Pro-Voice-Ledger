@@ -3,6 +3,7 @@ using Microsoft.Maui.Storage;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text;
 using ProVoiceLedger.Core.Models;
 using ProVoiceLedger.Core.Services;
 
@@ -23,7 +24,16 @@ namespace ProVoiceLedger.Pages
         private async void OnLoginButtonClicked(object sender, EventArgs e)
         {
             string username = UsernameEntry?.Text?.Trim() ?? string.Empty;
-            string password = PasswordEntry?.Text?.Trim() ?? string.Empty;
+            string rawPassword = PasswordEntry?.Text ?? string.Empty;
+
+            // 🔍 Log the raw password before trimming
+            Console.WriteLine($"🔐 Raw password input: '{rawPassword}'");
+
+            // 🧼 Normalize and trim password
+            string password = rawPassword.Trim().Normalize(NormalizationForm.FormC);
+
+            // 🔍 Log the final password being sent
+            Console.WriteLine($"🔐 Final password sent: '{password}'");
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {

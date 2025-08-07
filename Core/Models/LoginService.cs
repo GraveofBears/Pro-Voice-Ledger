@@ -4,13 +4,15 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Maui.Storage;
 using ProVoiceLedger.Core.Models;
+using System.Diagnostics;
+using System.Linq;
 
 namespace ProVoiceLedger.Core.Services
 {
     public class LoginService
     {
         private readonly HttpClient _httpClient;
-        private const string LoginEndpoint = "https://localhost:7290/api/auth/login";
+        private const string LoginEndpoint = "http://192.168.1.58:7290/api/auth/login";
 
         public LoginService(HttpClient httpClient)
         {
@@ -21,6 +23,12 @@ namespace ProVoiceLedger.Core.Services
         {
             try
             {
+                // 🔍 Diagnostic Logging
+                Debug.WriteLine($"🔍 Attempting login for: {request.Username}");
+                Debug.WriteLine($"🔍 Raw password: '{request.Password}'");
+                Debug.WriteLine($"🔍 Length: {request.Password?.Length}");
+                Debug.WriteLine($"🔍 Char codes: {string.Join(",", request.Password?.Select(c => (int)c) ?? Enumerable.Empty<int>())}");
+
                 var response = await _httpClient.PostAsJsonAsync(LoginEndpoint, request);
 
                 if (!response.IsSuccessStatusCode)
